@@ -1,8 +1,9 @@
-// BookingForm.jsx
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/BookingForm.css";
+
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const services = {
   "Manicure": 30,
@@ -37,9 +38,16 @@ const BookingForm = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/bookings');
+      const res = await fetch(`${API_URL}/api/bookings`);
       const data = await res.json();
-      setBookedSlots(data);
+
+      // Transform data into { date: [times...] }
+      const grouped = {};
+      data.forEach(b => {
+        if (!grouped[b.date]) grouped[b.date] = [];
+        grouped[b.date].push(b.time);
+      });
+      setBookedSlots(grouped);
     } catch (err) {
       console.error('Error fetching bookings', err);
     }
@@ -104,7 +112,7 @@ const BookingForm = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/bookings', {
+      const res = await fetch(`${API_URL}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -120,6 +128,7 @@ const BookingForm = () => {
       if (res.ok) {
         alert('Booking request submitted! Await admin approval.');
         setFormData({ name: "", email: "", service: "", date: null, time: "" });
+        fetchBookings();
       } else {
         const data = await res.json();
         alert('Error: ' + data.message);

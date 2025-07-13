@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 const services = [
   "Manicure & Pedicure",
   "Acrylic & Gel Nails",
@@ -47,34 +49,34 @@ function AdminDashboard() {
   }, []);
 
   const fetchBookings = async () => {
-    const res = await fetch('/api/bookings');
+    const res = await fetch(`${API_URL}/api/bookings`);
     const data = await res.json();
     setBookings(Array.isArray(data) ? data : []);
   };
 
   const fetchUsers = async () => {
-    const res = await fetch('/api/users');
+    const res = await fetch(`${API_URL}/api/users`);
     const data = await res.json();
     setUsers(Array.isArray(data) ? data : []);
   };
 
   const approveBooking = async (id) => {
-    await fetch(`/api/bookings/${id}/approve`, { method: 'PATCH' });
+    await fetch(`${API_URL}/api/bookings/${id}/approve`, { method: 'PATCH' });
     fetchBookings();
   };
 
   const rejectBooking = async (id) => {
-    await fetch(`/api/bookings/${id}/reject`, { method: 'PATCH' });
+    await fetch(`${API_URL}/api/bookings/${id}/reject`, { method: 'PATCH' });
     fetchBookings();
   };
 
   const deleteBooking = async (id) => {
-    await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/api/bookings/${id}`, { method: 'DELETE' });
     fetchBookings();
   };
 
   const deleteUser = async (id) => {
-    await fetch(`/api/users/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' });
     fetchUsers();
   };
 
@@ -96,9 +98,7 @@ function AdminDashboard() {
       if (b._id === _id || b.date !== date) return false;
       const existingStart = parseTime(b.time);
       const existingEnd = existingStart + (serviceDurations[b.service] || 30);
-      return (
-        (editedStart < existingEnd) && (existingStart < editedEnd)
-      );
+      return (editedStart < existingEnd) && (existingStart < editedEnd);
     });
   };
 
@@ -109,7 +109,7 @@ function AdminDashboard() {
     }
 
     const { _id, name, email, service, date, time, status } = editing;
-    await fetch(`/api/bookings/${_id}`, {
+    await fetch(`${API_URL}/api/bookings/${_id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, service, date, time, status })
