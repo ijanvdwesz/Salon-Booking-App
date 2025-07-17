@@ -47,7 +47,7 @@ const BookingForm = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/bookings');
+      const res = await fetch('(${process.env.BACKEND_URL}/api/bookings)');
       const data = await res.json();
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -126,7 +126,7 @@ const BookingForm = () => {
     }
 
     try {
-      const res = await fetch("/api/bookings", {
+      const res = await fetch("(${process.env.BACKEND_URL}/api/bookings)", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
