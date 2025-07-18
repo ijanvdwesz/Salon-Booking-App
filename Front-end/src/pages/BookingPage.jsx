@@ -47,7 +47,8 @@ const BookingForm = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings`);
+      console.log("Using backend URL:", process.env.REACT_APP_API_BASE_URL);
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`);
       const data = await res.json();
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
