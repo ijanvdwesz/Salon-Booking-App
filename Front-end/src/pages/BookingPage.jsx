@@ -126,7 +126,7 @@ const BookingForm = () => {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
