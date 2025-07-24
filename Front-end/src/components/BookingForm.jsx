@@ -3,13 +3,20 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/BookingForm.css";
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
-
+// Updated services with durations (in minutes)
 const services = {
-  "Manicure": 30,
-  "Pedicure": 60,
-  "Nail Art": 45,
-  "Gel Removal": 20
+  "Manicure & Pedicure": 60,
+  "Acrylic & Gel Nails": 75,
+  "Nail Art & Design": 45,
+  "Facials & Skin Treatments": 60,
+  "Massage Therapy": 60,
+  "Professional Makeup": 90,
+  "Waxing & Threading": 30,
+  "Body Scrubs & Spa Packages": 90,
+  "Hair Cutting & Styling": 45,
+  "Barbering & Beard Grooming": 30,
+  "Hair Coloring & Highlights": 90,
+  "Deep Conditioning & Hair Treatments": 45,
 };
 
 const BookingForm = () => {
@@ -18,11 +25,11 @@ const BookingForm = () => {
     email: "",
     service: "",
     date: null,
-    time: ""
+    time: "",
   });
 
   const [availableTimes, setAvailableTimes] = useState([]);
-  const [bookedSlots, setBookedSlots] = useState({});
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,53 +39,60 @@ const BookingForm = () => {
   useEffect(() => {
     if (formData.date && formData.service) {
       generateAvailableTimes();
+    } else {
+      setAvailableTimes([]);
     }
-  }, [formData.date, formData.service, bookedSlots]);
+  }, [formData.date, formData.service, bookings]);
 
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/bookings`);
+      console.log("Using backend URL:", process.env.REACT_APP_API_BASE_URL);
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`);
       const data = await res.json();
-
-      // Transform data into { date: [times...] }
-      const grouped = {};
-      data.forEach(b => {
-        if (!grouped[b.date]) grouped[b.date] = [];
-        grouped[b.date].push(b.time);
-      });
-      setBookedSlots(grouped);
+      setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Error fetching bookings', err);
+      console.error("Error fetching bookings", err);
     }
     setLoading(false);
   };
 
   const generateAvailableTimes = () => {
-    const slots = [];
     const startHour = 8;
     const endHour = 17;
-
-    if (!formData.date || !formData.service) return;
-
-    const selectedDate = formData.date.toISOString().split('T')[0];
-    const bookedTimes = bookedSlots[selectedDate] || [];
+    const slotInterval = 30;
+    const slots = [];
 
     const serviceDuration = services[formData.service] || 30;
+    const selectedDate = formData.date.toISOString().split('T')[0];
+
+    const sameDayBookings = bookings.filter(b => b.date === selectedDate);
 
     for (let hour = startHour; hour < endHour; hour++) {
-      for (let min = 0; min < 60; min += 30) {
-        const time = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-        const endMinutes = hour * 60 + min + serviceDuration;
-        if (endMinutes > endHour * 60) continue;
+      for (let min = 0; min < 60; min += slotInterval) {
+        const slotStart = hour * 60 + min;
+        const slotEnd = slotStart + serviceDuration;
+        if (slotEnd > endHour * 60) continue;
 
-        if (!bookedTimes.includes(time)) {
-          slots.push(time);
-        }
+        const slotTime = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+
+        const overlaps = sameDayBookings.some(b => {
+          const bookedStart = parseTimeToMinutes(b.time);
+          const bookedDuration = services[b.service] || 30;
+          const bookedEnd = bookedStart + bookedDuration;
+          return (slotStart < bookedEnd && bookedStart < slotEnd);
+        });
+
+        if (!overlaps) slots.push(slotTime);
       }
     }
 
     setAvailableTimes(slots);
+  };
+
+  const parseTimeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return hours * 60 + minutes;
   };
 
   const handleInputChange = e => {
@@ -91,9 +105,9 @@ const BookingForm = () => {
   };
 
   const isFullyBooked = (date) => {
-    const day = date.toISOString().split('T')[0];
-    const times = bookedSlots[day] || [];
-    return times.length >= 18;
+    const day = date.toISOString().split("T")[0];
+    const dayBookings = bookings.filter(b => b.date === day);
+    return dayBookings.length >= 18;
   };
 
   const filterDate = (date) => {
@@ -106,42 +120,45 @@ const BookingForm = () => {
     e.preventDefault();
 
     const { name, email, service, date, time } = formData;
+
     if (!name || !email || !service || !date || !time) {
       alert("Please complete all fields before submitting.");
       return;
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/bookings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      console.log("Submitting to:", process.env.REACT_APP_API_BASE_URL);
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           email,
           service,
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split("T")[0],
           time,
-          status: 'pending'
-        })
+          status: "pending",
+        }),
       });
 
       if (res.ok) {
-        alert('Booking request submitted! Await admin approval.');
+        alert("Booking request submitted! Await admin approval.");
         setFormData({ name: "", email: "", service: "", date: null, time: "" });
         fetchBookings();
       } else {
         const data = await res.json();
-        alert('Error: ' + data.message);
+        alert("Error: " + data.message);
       }
     } catch (err) {
-      console.error('Error submitting booking', err);
-      alert('An error occurred.');
+      console.error("Error submitting booking", err);
+      alert("An error occurred.");
     }
   };
 
   return (
     <div className="booking-form">
       <h2>Book Your Appointment</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -150,6 +167,7 @@ const BookingForm = () => {
           value={formData.name}
           onChange={handleInputChange}
         />
+
         <input
           type="email"
           name="email"
@@ -157,6 +175,7 @@ const BookingForm = () => {
           value={formData.email}
           onChange={handleInputChange}
         />
+
         <select
           name="service"
           value={formData.service}
@@ -169,6 +188,7 @@ const BookingForm = () => {
             </option>
           ))}
         </select>
+
         <DatePicker
           selected={formData.date}
           onChange={handleDateChange}
@@ -176,6 +196,7 @@ const BookingForm = () => {
           placeholderText="Select a Date"
           minDate={new Date()}
         />
+
         <select
           name="time"
           value={formData.time}
@@ -189,7 +210,8 @@ const BookingForm = () => {
             </option>
           ))}
         </select>
-        <button type="submit">Submit Booking</button>
+
+        <button type="submit" disabled={loading}>Submit Booking</button>
       </form>
     </div>
   );
