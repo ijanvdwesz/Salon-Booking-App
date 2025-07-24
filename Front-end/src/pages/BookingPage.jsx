@@ -127,6 +127,7 @@ const BookingForm = () => {
     }
 
     try {
+      console.log("Submitting to:", process.env.REACT_APP_API_BASE_URL);
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
