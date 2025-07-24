@@ -61,7 +61,6 @@ const BookingForm = () => {
     const endHour = 17;
     const slotInterval = 30;
     const slots = [];
-
     const serviceDuration = services[formData.service] || 30;
     const selectedDate = formData.date.toISOString().split('T')[0];
     const sameDayBookings = bookings.filter(b => b.date === selectedDate);
