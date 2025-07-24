@@ -3,7 +3,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/BookingForm.css";
 
-// Updated services with durations (in minutes)
 const services = {
   "Manicure & Pedicure": 60,
   "Acrylic & Gel Nails": 75,
@@ -65,7 +64,6 @@ const BookingForm = () => {
 
     const serviceDuration = services[formData.service] || 30;
     const selectedDate = formData.date.toISOString().split('T')[0];
-
     const sameDayBookings = bookings.filter(b => b.date === selectedDate);
 
     for (let hour = startHour; hour < endHour; hour++) {
@@ -75,18 +73,15 @@ const BookingForm = () => {
         if (slotEnd > endHour * 60) continue;
 
         const slotTime = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-
         const overlaps = sameDayBookings.some(b => {
           const bookedStart = parseTimeToMinutes(b.time);
           const bookedDuration = services[b.service] || 30;
           const bookedEnd = bookedStart + bookedDuration;
           return (slotStart < bookedEnd && bookedStart < slotEnd);
         });
-
         if (!overlaps) slots.push(slotTime);
       }
     }
-
     setAvailableTimes(slots);
   };
 
@@ -118,9 +113,7 @@ const BookingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { name, email, service, date, time } = formData;
-
     if (!name || !email || !service || !date || !time) {
       alert("Please complete all fields before submitting.");
       return;
@@ -158,59 +151,22 @@ const BookingForm = () => {
   return (
     <div className="booking-form">
       <h2>Book Your Appointment</h2>
-
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Your Name"
-          value={formData.name}
-          onChange={handleInputChange}
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Your Email"
-          value={formData.email}
-          onChange={handleInputChange}
-        />
-
-        <select
-          name="service"
-          value={formData.service}
-          onChange={handleInputChange}
-        >
+        <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleInputChange} />
+        <input type="email" name="email" placeholder="Your Email" value={formData.email} onChange={handleInputChange} />
+        <select name="service" value={formData.service} onChange={handleInputChange}>
           <option value="">Select a Service</option>
           {Object.keys(services).map((service) => (
-            <option key={service} value={service}>
-              {service}
-            </option>
+            <option key={service} value={service}>{service}</option>
           ))}
         </select>
-
-        <DatePicker
-          selected={formData.date}
-          onChange={handleDateChange}
-          filterDate={filterDate}
-          placeholderText="Select a Date"
-          minDate={new Date()}
-        />
-
-        <select
-          name="time"
-          value={formData.time}
-          onChange={handleInputChange}
-          disabled={!availableTimes.length}
-        >
+        <DatePicker selected={formData.date} onChange={handleDateChange} filterDate={filterDate} placeholderText="Select a Date" minDate={new Date()} />
+        <select name="time" value={formData.time} onChange={handleInputChange} disabled={!availableTimes.length}>
           <option value="">Select a Time</option>
           {availableTimes.map((time) => (
-            <option key={time} value={time}>
-              {time}
-            </option>
+            <option key={time} value={time}>{time}</option>
           ))}
         </select>
-
         <button type="submit" disabled={loading}>Submit Booking</button>
       </form>
     </div>
