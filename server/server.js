@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors'); // ✅ added
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const usersRoutes = require('./routes/users');
@@ -11,6 +13,15 @@ mongoose.connect('mongodb+srv://ijanvdwestz:Jenice18@cluster0.7hfkg.mongodb.net/
 })
 .then(() => console.log('✅ Connected to MongoDB Atlas'))
 .catch((err) => console.error('❌ MongoDB connection error:', err));
+
+// === CORS Middleware ===
+app.use(cors({
+  origin: [
+    'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  credentials: true
+}));
 
 // === Middleware ===
 app.use(express.json());
