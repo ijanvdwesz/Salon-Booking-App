@@ -15,7 +15,7 @@ const services = [
   "Barbering & Beard Grooming",
   "Hair Coloring & Highlights",
   "Deep Conditioning & Hair Treatments"
-];
+]; 
 
 const serviceDurations = {
   "Manicure & Pedicure": 60,
