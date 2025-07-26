@@ -18,6 +18,9 @@ const services = {
   "Deep Conditioning & Hair Treatments": 45,
 };
 
+// ✅ Your backend URL (production)
+const backendUrl = "https://salon-booking-app-vqzk.onrender.com";
+
 const BookingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -46,12 +49,12 @@ const BookingForm = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      console.log("Using backend URL:", process.env.REACT_APP_API_BASE_URL);
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`);
+      console.log("Fetching bookings from:", backendUrl);
+      const res = await fetch(`${backendUrl}/api/bookings`);
       const data = await res.json();
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Error fetching bookings", err);
+      console.error("Error fetching bookings:", err);
     }
     setLoading(false);
   };
@@ -119,8 +122,8 @@ const BookingForm = () => {
     }
 
     try {
-      console.log("Submitting to:", process.env.REACT_APP_API_BASE_URL);
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/bookings`, {
+      console.log("Submitting booking to:", backendUrl);
+      const res = await fetch(`${backendUrl}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,8 +145,8 @@ const BookingForm = () => {
         alert("Error: " + data.message);
       }
     } catch (err) {
-      console.error("Error submitting booking", err);
-      alert("An error occurred.");
+      console.error("Error submitting booking:", err);
+      alert("An error occurred while submitting your booking.");
     }
   };
 
@@ -159,14 +162,22 @@ const BookingForm = () => {
             <option key={service} value={service}>{service}</option>
           ))}
         </select>
-        <DatePicker selected={formData.date} onChange={handleDateChange} filterDate={filterDate} placeholderText="Select a Date" minDate={new Date()} />
+        <DatePicker 
+          selected={formData.date} 
+          onChange={handleDateChange} 
+          filterDate={filterDate} 
+          placeholderText="Select a Date" 
+          minDate={new Date()} 
+        />
         <select name="time" value={formData.time} onChange={handleInputChange} disabled={!availableTimes.length}>
           <option value="">Select a Time</option>
           {availableTimes.map((time) => (
             <option key={time} value={time}>{time}</option>
           ))}
         </select>
-        <button type="submit" disabled={loading}>Submit Booking</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Submit Booking"}
+        </button>
       </form>
     </div>
   );
