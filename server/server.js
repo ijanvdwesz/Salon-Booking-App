@@ -15,16 +15,29 @@ mongoose.connect('mongodb+srv://ijanvdwestz:Jenice18@cluster0.7hfkg.mongodb.net/
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // === CORS Middleware ===
+// List of allowed origins without trailing slashes
+const allowedOrigins = [
+  'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app',
+  'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app',
+  'https://salon-booking-g49jghg01-ijan-van-der-westhuizens-projects.vercel.app',
+  'https://salon-booking.vercel.app',
+  'https://salon-booking-k2orghwqq-ijan-van-der-westhuizens-projects.vercel.app'
+];
+
 app.use(cors({
-  origin: [
-    'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app',                // old frontend
-    'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app',             // main branch
-    'https://salon-booking-g49jghg01-ijan-van-der-westhuizens-projects.vercel.app',                // new deployment that caused errors
-    'https://salon-booking.vercel.app' ,                                                            // optional: production domain if you use custom
-    'https://salon-booking-k2orghwqq-ijan-van-der-westhuizens-projects.vercel.app/'
-  ],
+  origin: function (origin, callback) {
+    if (!origin) {
+      // Allow REST tools like Postman or curl with no origin
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error(`CORS policy: Origin ${origin} not allowed.`));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true
+  credentials: true,
 }));
 
 // === Middleware ===
@@ -36,7 +49,7 @@ app.use('/api/bookings', bookingsRoutes);
 
 app.use('/api/users', usersRoutes);
 
-// === Dummy test data (can be removed if Mongo is used for all bookings) ===
+// === Dummy test data (optional, can be removed if MongoDB used fully) ===
 let bookedSlots = [
   { date: '2025-04-15', time: '09:00' },
   { date: '2025-04-15', time: '10:00' },
