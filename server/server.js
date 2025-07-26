@@ -20,7 +20,8 @@ app.use(cors({
     'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app',                // old frontend
     'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app',             // main branch
     'https://salon-booking-g49jghg01-ijan-van-der-westhuizens-projects.vercel.app',                // new deployment that caused errors
-    'https://salon-booking.vercel.app'                                                              // optional: production domain if you use custom
+    'https://salon-booking.vercel.app' ,                                                            // optional: production domain if you use custom
+    'https://salon-booking-k2orghwqq-ijan-van-der-westhuizens-projects.vercel.app/'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
