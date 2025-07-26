@@ -17,7 +17,8 @@ mongoose.connect('mongodb+srv://ijanvdwestz:Jenice18@cluster0.7hfkg.mongodb.net/
 // === CORS Middleware ===
 app.use(cors({
   origin: [
-    'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app'
+    'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app', // old frontend domain
+    'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app' // new frontend domain from your error logs
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true

@@ -1,4 +1,5 @@
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import React from "react";
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
 
 const containerStyle = {
   width: '100%',
@@ -6,19 +7,36 @@ const containerStyle = {
 };
 
 const center = {
-  lat: -26.2041, // Example: Johannesburg
+  lat: -26.2041, // Johannesburg (example)
   lng: 28.0473
 };
 
 function MapComponent() {
+  const handleOnLoad = (map) => {
+    if (window.google && window.google.maps && window.google.maps.marker) {
+      // Add AdvancedMarkerElement instead of Marker
+      new window.google.maps.marker.AdvancedMarkerElement({
+        map,
+        position: center,
+        title: 'Glamour Beauty & Spa'
+      });
+    } else {
+      console.warn("AdvancedMarkerElement API not available. Check that 'libraries=marker' is loaded in your script URL.");
+    }
+  };
+
   return (
-    <LoadScript googleMapsApiKey="AIzaSyAosaqSJm5RVYOUSTclJpE0qT4GNSzsXOU">
+    <LoadScript
+      googleMapsApiKey="AIzaSyAosaqSJm5RVYOUSTclJpE0qT4GNSzsXOU"
+      libraries={['marker']}
+    >
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
         zoom={15}
+        onLoad={handleOnLoad}
       >
-        <Marker position={center} />
+        {/* Removed <Marker /> */}
       </GoogleMap>
     </LoadScript>
   );
