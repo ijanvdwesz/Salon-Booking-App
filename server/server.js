@@ -21,7 +21,7 @@ const allowedOrigins = [
   'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app',
   'https://salon-booking-g49jghg01-ijan-van-der-westhuizens-projects.vercel.app',
   'https://salon-booking.vercel.app',
-  'https://salon-booking-a2l5sm68h-ijan-van-der-westhuizens-projects.vercel.app/'
+  'https://salon-booking-a2l5sm68h-ijan-van-der-westhuizens-projects.vercel.app'
 ];
 
 app.use(cors({
