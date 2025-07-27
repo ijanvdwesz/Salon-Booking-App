@@ -15,22 +15,16 @@ mongoose.connect('mongodb+srv://ijanvdwestz:Jenice18@cluster0.7hfkg.mongodb.net/
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // === CORS Middleware ===
-// List of allowed origins without trailing slashes
-const allowedOrigins = [
-  'https://salon-booking-hi9pl3ktg-ijan-van-der-westhuizens-projects.vercel.app',
-  'https://salon-booking-app-git-main-ijan-van-der-westhuizens-projects.vercel.app',
-  'https://salon-booking-g49jghg01-ijan-van-der-westhuizens-projects.vercel.app',
-  'https://salon-booking.vercel.app',
-  'https://salon-booking-dp9urkb6p-ijan-van-der-westhuizens-projects.vercel.app/'
-];
-
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) {
       // Allow REST tools like Postman or curl with no origin
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    if (
+      origin === 'https://salon-booking.vercel.app' ||
+      (origin.startsWith('https://salon-booking') && origin.includes('.vercel.app'))
+    ) {
       return callback(null, true);
     } else {
       return callback(new Error(`CORS policy: Origin ${origin} not allowed.`));
