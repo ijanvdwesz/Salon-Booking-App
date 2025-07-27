@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+// ✅ Hardcoded backend URL
+const API_URL = 'https://salon-booking-app-vqzk.onrender.com';
 
 const services = [
   "Manicure & Pedicure",
@@ -15,7 +16,7 @@ const services = [
   "Barbering & Beard Grooming",
   "Hair Coloring & Highlights",
   "Deep Conditioning & Hair Treatments"
-]; 
+];
 
 const serviceDurations = {
   "Manicure & Pedicure": 60,
@@ -49,15 +50,33 @@ function AdminDashboard() {
   }, []);
 
   const fetchBookings = async () => {
-    const res = await fetch(`${API_URL}/api/bookings`);
-    const data = await res.json();
-    setBookings(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch(`${API_URL}/api/bookings`);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Fetch bookings failed:', res.status, text);
+        return;
+      }
+      const data = await res.json();
+      setBookings(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+    }
   };
 
   const fetchUsers = async () => {
-    const res = await fetch(`${API_URL}/api/users`);
-    const data = await res.json();
-    setUsers(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch(`${API_URL}/api/users`);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Fetch users failed:', res.status, text);
+        return;
+      }
+      const data = await res.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
   };
 
   const approveBooking = async (id) => {
@@ -107,7 +126,6 @@ function AdminDashboard() {
       alert("This time slot conflicts with another booking.");
       return;
     }
-
     const { _id, name, email, service, date, time, status } = editing;
     await fetch(`${API_URL}/api/bookings/${_id}`, {
       method: 'PATCH',
